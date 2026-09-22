@@ -24,6 +24,7 @@ existing destination table
 Build and pack the tool:
 
 ```bash
+dotnet add package Microsoft.Data.SqlClient.Extensions.Azure
 dotnet pack /absolute/path/to/sqlbulkcopy-cli/src/sqlbulkcopy/sqlbulkcopy.csproj -c Release
 dotnet tool install --global --add-source /absolute/path/to/sqlbulkcopy-cli/src/sqlbulkcopy/bin/Release sqlbulkcopy
 ```
