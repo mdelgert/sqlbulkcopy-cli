@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="sqlbulkcopy-cli.Tests/sqlbulkcopy-cli.Tests.csproj" />
+  <Project Path="sqlbulkcopy-cli/sqlbulkcopy-cli.csproj" />
+</Solution>
