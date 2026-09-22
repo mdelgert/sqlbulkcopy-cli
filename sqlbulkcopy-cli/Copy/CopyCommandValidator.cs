@@ -4,9 +4,9 @@ internal static class CopyCommandValidator
 {
     public static void Validate(CopyCommandOptions options, bool isInteractive)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.SourceConnection);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.DestinationConnection);
-        ArgumentException.ThrowIfNullOrWhiteSpace(options.DestinationTable);
+        RequireValue(options.SourceConnection, "--source-connection");
+        RequireValue(options.DestinationConnection, "--destination-connection");
+        RequireValue(options.DestinationTable, "--destination-table");
 
         var hasSourceQuery = !string.IsNullOrWhiteSpace(options.SourceQuery);
         var hasSourceObject = !string.IsNullOrWhiteSpace(options.SourceObject);
@@ -51,6 +51,14 @@ internal static class CopyCommandValidator
                 ? "Pass --confirm-destructive to continue with the requested destructive mode."
                 : "Automation must explicitly pass --confirm-destructive for truncate or delete mode.";
             throw new InvalidOperationException(guidance);
+        }
+    }
+
+    private static void RequireValue(string? value, string optionName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new InvalidOperationException($"{optionName} is required.");
         }
     }
 }

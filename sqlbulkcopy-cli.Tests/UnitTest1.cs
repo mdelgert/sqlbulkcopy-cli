@@ -1,4 +1,5 @@
 using sqlbulkcopy_cli.Copy;
+using sqlbulkcopy_cli.Configuration;
 using sqlbulkcopy_cli.Sql;
 
 namespace sqlbulkcopy_cli.Tests;
@@ -80,6 +81,14 @@ public sealed class ColumnMappingParserTests
 
         Assert.Contains("Expected source=destination", exception.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Parse_rejects_duplicate_mappings()
+    {
+        var exception = Assert.Throws<InvalidOperationException>(() => ColumnMappingParser.Parse(["SourceId=DestinationId", "SourceId=DestinationName"]));
+
+        Assert.Contains("Duplicate mapping", exception.Message, StringComparison.Ordinal);
+    }
 }
 
 public sealed class CopyCommandValidatorTests
@@ -141,4 +150,47 @@ public sealed class CopyCommandValidatorTests
             TableLock: false,
             FireTriggers: false,
             UseInternalTransaction: useInternalTransaction);
+}
+
+public sealed class AppSettingsLoaderTests
+{
+    [Fact]
+    public void Load_applies_environment_variables_over_json_configuration()
+    {
+        var tempDirectory = Directory.CreateTempSubdirectory();
+        var configPath = Path.Combine(tempDirectory.FullName, "sqlbulkcopy.json");
+        File.WriteAllText(
+            configPath,
+            """
+            {
+              "sourceConnection": "Server=file-source;Database=FileDb;",
+              "destinationConnection": "Server=file-destination;Database=FileDb;",
+              "destinationTable": "dbo.Target",
+              "batchSize": 5000,
+              "map": [ "FileId=Id" ]
+            }
+            """);
+
+        Environment.SetEnvironmentVariable("SQLBULKCOPY_SOURCE_CONNECTION", "Server=env-source;Database=EnvDb;");
+        Environment.SetEnvironmentVariable("SQLBULKCOPY_BATCH_SIZE", "9000");
+        Environment.SetEnvironmentVariable("SQLBULKCOPY_MAP", "EnvId=Id;EnvName=Name");
+
+        try
+        {
+            var settings = AppSettingsLoader.Load(configPath);
+
+            Assert.Equal("Server=env-source;Database=EnvDb;", settings.SourceConnection);
+            Assert.Equal("Server=file-destination;Database=FileDb;", settings.DestinationConnection);
+            Assert.Equal("dbo.Target", settings.DestinationTable);
+            Assert.Equal(9000, settings.BatchSize);
+            Assert.Equal(["EnvId=Id", "EnvName=Name"], settings.Map);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("SQLBULKCOPY_SOURCE_CONNECTION", null);
+            Environment.SetEnvironmentVariable("SQLBULKCOPY_BATCH_SIZE", null);
+            Environment.SetEnvironmentVariable("SQLBULKCOPY_MAP", null);
+            tempDirectory.Delete(recursive: true);
+        }
+    }
 }
