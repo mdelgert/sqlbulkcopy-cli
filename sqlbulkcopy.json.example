@@ -1,0 +1,11 @@
+{
+  "sourceConnection": "Server=tcp:source.database.windows.net,1433;Database=SourceDb;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;",
+  "sourceObject": "dbo.vwCustomers",
+  "destinationConnection": "Server=tcp:destination.database.windows.net,1433;Database=DestinationDb;Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;",
+  "destinationTable": "dbo.Customers",
+  "mode": "append",
+  "batchSize": 10000,
+  "notifyAfter": 10000,
+  "mapping": "auto",
+  "map": []
+}
