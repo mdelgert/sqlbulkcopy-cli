@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>sqlbulkcopy</PackageId>
+    <ToolCommandName>sqlbulkcopy</ToolCommandName>
+    <Description>Copy rows from a SQL Server or Azure SQL query directly into an existing table with SqlBulkCopy.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.0" />
+  </ItemGroup>
+
+</Project>
